@@ -1,0 +1,18 @@
+syntax = "v1"
+
+info (
+	user: "kunzige"
+	desc: "处理文件上传下载相关"
+)
+
+
+type FileUploadResponse {
+	Message string `json:"message"`
+}
+
+service FileService {
+	@doc "文件上传"
+	@handler fileUploadHandler
+	post /file/upload (FileUploadRequest) returns (FileUploadResponse)
+}
+
