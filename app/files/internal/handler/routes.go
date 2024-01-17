@@ -13,6 +13,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
+				Method:  http.MethodGet,
+				Path:    "/file/download",
+				Handler: fileDownloadHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/file/info",
+				Handler: fileInfoHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodPost,
 				Path:    "/file/upload",
 				Handler: fileUploadHandler(serverCtx),
