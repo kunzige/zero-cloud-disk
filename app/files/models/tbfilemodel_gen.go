@@ -28,6 +28,7 @@ type (
 		FindOneByFileSha1(ctx context.Context, fileSha1 string) (*TbFile, error)
 		Update(ctx context.Context, data *TbFile) error
 		Delete(ctx context.Context, id int64) error
+		UpdateBySha1(ctx context.Context, file_hash string,new_name string) error 
 	}
 
 	defaultTbFileModel struct {
@@ -101,6 +102,13 @@ func (m *defaultTbFileModel) Update(ctx context.Context, newData *TbFile) error 
 	_, err := m.conn.ExecCtx(ctx, query, newData.FileSha1, newData.FileName, newData.FileSize, newData.FileAddr, newData.DeleteAt, newData.Status, newData.Ext, newData.Id)
 	return err
 }
+
+func (m *defaultTbFileModel) UpdateBySha1(ctx context.Context, file_hash string,new_name string) error {
+	query := fmt.Sprintf("update %s set %s = ?  where `file_sha1` = ?", m.table, "file_name")
+	_, err := m.conn.ExecCtx(ctx, query,new_name,file_hash)
+	return err
+}
+
 
 func (m *defaultTbFileModel) tableName() string {
 	return m.table

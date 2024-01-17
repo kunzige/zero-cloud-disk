@@ -6,7 +6,7 @@ type FileDownloadRequest struct {
 }
 
 type FileDownloadResponse struct {
-	Message string `json:"message"`
+	Message  string `json:"message"`
 	FileName string `json:"file_name"`
 	FilePath string `json:"file_path"`
 }
@@ -20,6 +20,15 @@ type FileInfoResponse struct {
 	FileSize int64  `json:"file_size"`
 	CreateAt string `json:"create_at"`
 	UpdateAt string `json:"update_at"`
+}
+
+type FileModifyRequest struct {
+	FileHash    string `form:"file_hash"`
+	NewFileName string `form:"new_file_name"`
+}
+
+type FileModifyResponse struct {
+	Message string `json:"message"`
 }
 
 type FileUploadResponse struct {
