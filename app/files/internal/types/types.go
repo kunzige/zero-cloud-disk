@@ -31,6 +31,11 @@ type FileModifyResponse struct {
 	Message string `json:"message"`
 }
 
+type FileUploadRequest struct {
+	UserName string `form:"user_name"`
+	UserEmail string `form:"user_email"`
+}
+
 type FileUploadResponse struct {
 	Message string `json:"message"`
 }

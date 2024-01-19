@@ -6,6 +6,12 @@ info (
 )
 
 // 上传文件
+
+type FileUploadRequest {
+	UserName string `form:"user_name"`
+	UserEmail string `form:"user_email"`
+}
+
 type FileUploadResponse {
 	Message string `json:"message"`
 }

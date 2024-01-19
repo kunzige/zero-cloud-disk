@@ -4,5 +4,7 @@ import "github.com/zeromicro/go-zero/rest"
 
 type Config struct {
 	rest.RestConf
-	DataSource string
+	Mysql struct {
+		DataSource string
+	}
 }

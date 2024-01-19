@@ -7,7 +7,6 @@ import (
 	"database/sql"
 	"fmt"
 	"strings"
-
 	"github.com/zeromicro/go-zero/core/stores/builder"
 	"github.com/zeromicro/go-zero/core/stores/sqlc"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
@@ -29,6 +28,7 @@ type (
 		Update(ctx context.Context, data *TbFile) error
 		Delete(ctx context.Context, id int64) error
 		UpdateBySha1(ctx context.Context, file_hash string,new_name string) error 
+		Upload(tbFile *TbFile,tbUserFile *TbUserFile)error
 	}
 
 	defaultTbFileModel struct {
@@ -45,7 +45,7 @@ type (
 		CreateAt string         `db:"create_at"` // 创建时间
 		UpdateAt string         `db:"update_at"` // 更新时间
 		DeleteAt sql.NullString `db:"delete_at"` // 删除时间
-		Status   int64          `db:"status"`    // 状态(是否删除)
+		Indexes   int64          `db:"indexes"`    // 状态(是否删除)
 		Ext      sql.NullString `db:"ext"`       // 扩展
 	}
 )
@@ -92,14 +92,17 @@ func (m *defaultTbFileModel) FindOneByFileSha1(ctx context.Context, fileSha1 str
 }
 
 func (m *defaultTbFileModel) Insert(ctx context.Context, data *TbFile) (sql.Result, error) {
+	// 先上传到本地服务器，再更新文件表
 	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?)", m.table, tbFileRowsExpectAutoSet)
-	ret, err := m.conn.ExecCtx(ctx, query, data.FileSha1, data.FileName, data.FileSize, data.FileAddr, data.DeleteAt, data.Status, data.Ext)
+	ret, err := m.conn.ExecCtx(ctx, query, data.FileSha1, data.FileName, data.FileSize, data.FileAddr, data.DeleteAt, data.Indexes, data.Ext)
 	return ret, err
+
+
 }
 
 func (m *defaultTbFileModel) Update(ctx context.Context, newData *TbFile) error {
 	query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, tbFileRowsWithPlaceHolder)
-	_, err := m.conn.ExecCtx(ctx, query, newData.FileSha1, newData.FileName, newData.FileSize, newData.FileAddr, newData.DeleteAt, newData.Status, newData.Ext, newData.Id)
+	_, err := m.conn.ExecCtx(ctx, query, newData.FileSha1, newData.FileName, newData.FileSize, newData.FileAddr, newData.DeleteAt, newData.Indexes, newData.Ext, newData.Id)
 	return err
 }
 
@@ -112,4 +115,33 @@ func (m *defaultTbFileModel) UpdateBySha1(ctx context.Context, file_hash string,
 
 func (m *defaultTbFileModel) tableName() string {
 	return m.table
+}
+
+
+
+func (m *defaultTbFileModel)Upload(tbFile *TbFile,tbUserFile *TbUserFile)error{
+
+		return m.conn.Transact(
+			func(session sqlx.Session) error {
+				// 先上传到本地服务器，再更新文件表
+				query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?)", m.table, tbFileRowsExpectAutoSet)
+				_, err := session.Exec(query, tbFile.FileSha1, tbFile.FileName, tbFile.FileSize, tbFile.FileAddr, tbFile.DeleteAt, tbFile.Indexes, tbFile.Ext)
+				// return ret, err
+				if err!=nil{
+					fmt.Println(err.Error())
+					return err
+				}
+		
+				// status默认是0。
+				query = fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?,?)",GetUserFileName(), tbUserFileRowsExpectAutoSet)
+				_, err = session.Exec(query, tbUserFile.UserName, tbUserFile.UserEmail, tbUserFile.FileName, tbUserFile.FileSize, tbUserFile.FileSha1, tbUserFile.UploadAt, tbUserFile.LastUpdate,tbUserFile.Status)
+				if err!=nil{
+					fmt.Println(err.Error())
+					return err
+				}
+				return  nil
+			},
+		)
+	
+	
 }

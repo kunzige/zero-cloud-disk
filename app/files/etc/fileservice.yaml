@@ -2,4 +2,6 @@ Name: FileService
 Host: 0.0.0.0
 Port: 8888
 
-DataSource: root:123#Mysql@tcp(localhost:8000)/clouddisk?charset=utf8mb4&parseTime=True&loc=Local
+Mysql:
+  DataSource: root:123#Mysql@tcp(45.93.28.51:8000)/clouddisk?charset=utf8mb4&parseTime=True&loc=Local
+

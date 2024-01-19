@@ -2,16 +2,18 @@ package handler
 
 import (
 	"fmt"
+
 	"net/http"
 
 	"zero-cloud-disk/app/files/internal/logic"
 	"zero-cloud-disk/app/files/internal/svc"
+	"zero-cloud-disk/app/files/internal/types"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
 const (
-	defaultMultipartMemory = 32 << 20 // 32 MB
+	defaultMultipartMemory = 16 << 20 // 32 MB
 )
 
 func fileUploadHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
@@ -21,6 +23,11 @@ func fileUploadHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			fmt.Println(err)
 			httpx.Error(w, err)
 			return
+		}
+
+		var req = types.FileUploadRequest{
+			UserEmail: r.Form.Get("user_email"),
+			UserName:  r.Form.Get("user_name"),
 		}
 
 		// uploadedFiles := r.MultipartForm.File
@@ -34,10 +41,13 @@ func fileUploadHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		// 	}
 		// }
 
+		for i := 0; i < 3; i++ {
+			fmt.Println(r.Form)
+		}
+
 		// 单文件上传
 		l.Files = r.MultipartForm.File["file"]
-
-		resp, err := l.FileUpload()
+		resp, err := l.FileUpload(req)
 		if err != nil {
 			fmt.Println(err)
 			httpx.ErrorCtx(r.Context(), w, err)

@@ -15,6 +15,6 @@ type ServiceContext struct {
 func NewServiceContext(c config.Config) *ServiceContext {
 	return &ServiceContext{
 		Config:      c,
-		TbFileModel: models.NewTbFileModel(sqlx.NewSqlConn("mysql", c.DataSource)),
+		TbFileModel: models.NewTbFileModel(sqlx.NewSqlConn("mysql", c.Mysql.DataSource)),
 	}
 }

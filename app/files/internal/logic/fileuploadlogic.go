@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"mime/multipart"
 	"os"
+	"time"
 
 	"zero-cloud-disk/app/files/internal/svc"
 	"zero-cloud-disk/app/files/internal/types"
@@ -33,14 +33,15 @@ func NewFileUploadLogic(ctx context.Context, svcCtx *svc.ServiceContext) *FileUp
 	}
 }
 
-func (l *FileUploadLogic) FileUpload() (resp *types.FileUploadResponse, err error) {
+func (l *FileUploadLogic) FileUpload(req types.FileUploadRequest) (resp *types.FileUploadResponse, err error) {
 	// todo: add your logic here and delete this line
 
 	// 保存文件
 	file, err := l.Files[0].Open()
 	defer file.Close()
 	if err != nil {
-		panic(err.Error())
+		fmt.Println(err.Error())
+		return nil, fmt.Errorf("上传文件失败")
 	}
 	os.MkdirAll("./public/files/", os.ModePerm)
 	save, _ := os.Create("./public/files/" + l.Files[0].Filename)
@@ -55,22 +56,28 @@ func (l *FileUploadLogic) FileUpload() (resp *types.FileUploadResponse, err erro
 		FileName: l.Files[0].Filename,
 		FileAddr: "/public/files/",
 		FileSize: l.Files[0].Size,
-		Status:   1,
 	}
 	message, err := json.Marshal(fileMeta)
 	if err != nil {
-		panic(err.Error())
+		fmt.Println(err.Error())
+		return nil, fmt.Errorf("上传文件失败")
 	}
 
 	encrypt_hash := utils.Encrypt(string(message))
 
 	fileMeta.FileSha1 = encrypt_hash
 
-	_, err = l.svcCtx.TbFileModel.Insert(l.ctx, &fileMeta)
+	// 用户与文件关联
+	userFile := models.TbUserFile{UserName: req.UserName, FileName: l.Files[0].Filename,
+		UserEmail: req.UserEmail, FileSize: l.Files[0].Size, FileSha1: encrypt_hash,
+		UploadAt: time.Now(), LastUpdate: time.Now(), Status: 0,
+	}
+
+	// _, err = l.svcCtx.TbFileModel.Insert(l.ctx, &fileMeta)
+	err = l.svcCtx.TbFileModel.Upload(&fileMeta, &userFile)
 
 	if err != nil {
-		log.Println(err.Error())
-		return nil, fmt.Errorf("上传文件失败")
+		return nil, err
 	}
 
 	return &types.FileUploadResponse{Message: "file upload ok!"}, nil
