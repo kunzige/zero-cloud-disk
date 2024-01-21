@@ -9,6 +9,7 @@ type FileDownloadResponse struct {
 	Message  string `json:"message"`
 	FileName string `json:"file_name"`
 	FilePath string `json:"file_path"`
+	FileSize int64 `json:"file_size"`
 }
 
 type FileInfoRequest struct {

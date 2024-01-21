@@ -36,5 +36,5 @@ func (l *FileDownloadLogic) FileDownload(req *types.FileDownloadRequest) (resp *
 	if err == models.ErrNotFound {
 		return nil, fmt.Errorf("下载失败")
 	}
-	return &types.FileDownloadResponse{Message: "ok", FileName: fileMeta.FileName, FilePath: fileMeta.FileAddr}, nil
+	return &types.FileDownloadResponse{Message: "ok", FileName: fileMeta.FileName, FilePath: fileMeta.FileAddr, FileSize: fileMeta.FileSize}, nil
 }

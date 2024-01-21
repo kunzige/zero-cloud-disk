@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"strings"
 
 	"net/http"
 
@@ -30,23 +31,19 @@ func fileUploadHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			UserName:  r.Form.Get("user_name"),
 		}
 
-		// uploadedFiles := r.MultipartForm.File
-
 		l := logic.NewFileUploadLogic(r.Context(), svcCtx)
 
 		// 多文件上传
-		// for key, files := range uploadedFiles {
-		// 	if strings.HasPrefix(key, "file") {
-		// 		l.Files = append(l.Files, files...)
-		// 	}
-		// }
-
-		for i := 0; i < 3; i++ {
-			fmt.Println(r.Form)
+		uploadedFiles := r.MultipartForm.File
+		for key, files := range uploadedFiles {
+			if strings.HasPrefix(key, "file") {
+				l.Files = append(l.Files, files...)
+			}
 		}
 
 		// 单文件上传
-		l.Files = r.MultipartForm.File["file"]
+		// l.Files = r.MultipartForm.File["file"]
+
 		resp, err := l.FileUpload(req)
 		if err != nil {
 			fmt.Println(err)

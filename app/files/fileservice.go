@@ -21,7 +21,7 @@ func main() {
 	conf.MustLoad(*configFile, &c)
 	// 更改上传文件的最大限制
 	c.RestConf.MaxBytes = 1024 << 20
-	c.RestConf.Timeout = 30000
+	c.RestConf.Timeout = 60000
 	server := rest.MustNewServer(c.RestConf)
 	defer server.Stop()
 
