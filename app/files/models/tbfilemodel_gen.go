@@ -29,6 +29,7 @@ type (
 		Delete(ctx context.Context, id int64) error
 		UpdateBySha1(ctx context.Context, file_hash string,new_name string) error 
 		Upload(tbFile *TbFile,tbUserFile *TbUserFile)error
+		UpdatePathBySha1(ctx context.Context, file_hash string,new_path string) error
 	}
 
 	defaultTbFileModel struct {
@@ -109,6 +110,12 @@ func (m *defaultTbFileModel) Update(ctx context.Context, newData *TbFile) error 
 func (m *defaultTbFileModel) UpdateBySha1(ctx context.Context, file_hash string,new_name string) error {
 	query := fmt.Sprintf("update %s set %s = ?  where `file_sha1` = ?", m.table, "file_name")
 	_, err := m.conn.ExecCtx(ctx, query,new_name,file_hash)
+	return err
+}
+
+func (m *defaultTbFileModel) UpdatePathBySha1(ctx context.Context, file_hash string,new_path string) error {
+	query := fmt.Sprintf("update %s set %s = ?  where `file_sha1` = ?", m.table, "file_addr")
+	_, err := m.conn.ExecCtx(ctx, query,new_path,file_hash)
 	return err
 }
 

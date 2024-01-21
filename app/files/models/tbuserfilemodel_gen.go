@@ -28,6 +28,8 @@ type (
 		FindOne(ctx context.Context, id int64) (*TbUserFile, error)
 		Update(ctx context.Context, data *TbUserFile) error
 		Delete(ctx context.Context, id int64) error
+		FindListByEmail(ctx context.Context,email string) ([]*TbUserFile, error)
+		DeleteByHash(ctx context.Context, hash string) error
 	}
 
 	defaultTbUserFileModel struct {
@@ -61,6 +63,13 @@ func (m *defaultTbUserFileModel) Delete(ctx context.Context, id int64) error {
 	return err
 }
 
+func (m *defaultTbUserFileModel) DeleteByHash(ctx context.Context, hash string) error {
+	query := fmt.Sprintf("delete from %s where `file_sha1` = ?", m.table)
+	_, err := m.conn.ExecCtx(ctx, query, hash)
+	return err
+}
+
+
 func (m *defaultTbUserFileModel) FindOne(ctx context.Context, id int64) (*TbUserFile, error) {
 	query := fmt.Sprintf("select %s from %s where `id` = ? limit 1", tbUserFileRows, m.table)
 	var resp TbUserFile
@@ -68,6 +77,20 @@ func (m *defaultTbUserFileModel) FindOne(ctx context.Context, id int64) (*TbUser
 	switch err {
 	case nil:
 		return &resp, nil
+	case sqlx.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
+func (m *defaultTbUserFileModel) FindListByEmail(ctx context.Context,email string) ([]*TbUserFile, error) {
+	query := fmt.Sprintf("select %s from %s where `user_email` = ?", tbUserFileRows, m.table)
+	var resp []*TbUserFile
+	err := m.conn.QueryRowsCtx(ctx, &resp, query, email)
+	switch err {
+	case nil:
+		return resp, nil
 	case sqlx.ErrNotFound:
 		return nil, ErrNotFound
 	default:

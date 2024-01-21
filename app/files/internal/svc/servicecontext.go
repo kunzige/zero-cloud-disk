@@ -8,13 +8,15 @@ import (
 )
 
 type ServiceContext struct {
-	Config      config.Config
-	TbFileModel models.TbFileModel
+	Config          config.Config
+	TbFileModel     models.TbFileModel
+	TbUserFileModel models.TbUserFileModel
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
 	return &ServiceContext{
-		Config:      c,
-		TbFileModel: models.NewTbFileModel(sqlx.NewSqlConn("mysql", c.Mysql.DataSource)),
+		Config:          c,
+		TbFileModel:     models.NewTbFileModel(sqlx.NewSqlConn("mysql", c.Mysql.DataSource)),
+		TbUserFileModel: models.NewTbUserFileModel(sqlx.NewSqlConn("mysql", c.Mysql.DataSource)),
 	}
 }

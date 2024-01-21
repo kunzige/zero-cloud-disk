@@ -9,7 +9,7 @@ type FileDownloadResponse struct {
 	Message  string `json:"message"`
 	FileName string `json:"file_name"`
 	FilePath string `json:"file_path"`
-	FileSize int64 `json:"file_size"`
+	FileSize int64  `json:"file_size"`
 }
 
 type FileInfoRequest struct {
@@ -33,10 +33,35 @@ type FileModifyResponse struct {
 }
 
 type FileUploadRequest struct {
-	UserName string `form:"user_name"`
+	UserName  string `form:"user_name"`
 	UserEmail string `form:"user_email"`
 }
 
 type FileUploadResponse struct {
+	Message string `json:"message"`
+}
+
+type FileDeleteRequest struct {
+	FileHash string `form:"file_hash"`
+}
+
+type FileDeleteResponse struct {
+	Message string `json:"message"`
+}
+
+type FileListRequest struct {
+	UserEmail string `form:"user_email"`
+}
+
+type FileListResponse struct {
+	Data interface{} `json:"data"`
+}
+
+type FileMoveRequest struct {
+	FileHash string `form:"file_hash"`
+	NewPath  string `form:"new_path"`
+}
+
+type FileMoveResponse struct {
 	Message string `json:"message"`
 }
