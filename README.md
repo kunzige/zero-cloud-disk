@@ -5,7 +5,7 @@
     cd app/applet
     go run diskservice.go
 
-## 启动文件微服务
+## 启动微服务
 ### 文件服务
     cd app/file-rpc/
     go run file.go 
