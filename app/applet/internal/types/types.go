@@ -155,6 +155,7 @@ type UserLoginRequest struct {
 
 type UserLoginResponse struct {
 	Message string `json:"message"`
+	Token   string `json:"token"`
 }
 
 type UserRegisterRequest struct {

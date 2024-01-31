@@ -35,6 +35,7 @@ type userLoginRequest {
 
 type userLoginResponse {
 	Message string `json:"message"`
+	Token   string `json:"token"`
 }
 
 // 用户信息
@@ -62,7 +63,14 @@ service DiskService {
 	@doc "用户登录"
 	@handler userLoginHandler
 	post /login (userLoginRequest) returns (userLoginResponse)
+}
 
+@server (
+	group:  user
+	prefix: /user
+	jwt:    Auth
+)
+service DiskService {
 	@doc "获取用户信息"
 	@handler userInfoHandler
 	get /info (userInfoRequest) returns (userInfoResponse)
@@ -182,6 +190,7 @@ type createFolderResponse {
 @server (
 	prefix: /file
 	group:  file
+	jwt:    Auth
 )
 service DiskService {
 	@doc "文件上传"
@@ -264,6 +273,7 @@ type getShareResponse {
 @server (
 	prefix: /share
 	group:  share
+	jwt:    Auth
 )
 service DiskService {
 	@doc "分享文件"
@@ -273,7 +283,13 @@ service DiskService {
 	@doc "取消分享"
 	@handler cancelFileShareHandler
 	delete /cancel (cancelFileShareRequest) returns (cancelFileShareResponse)
+}
 
+@server (
+	prefix: /share
+	group:  share
+)
+service DiskService {
 	@doc "查看分享的文件"
 	@handler getShareHandler
 	get /get (getShareRequest) returns (getShareResponse)

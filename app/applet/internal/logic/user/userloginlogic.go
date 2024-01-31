@@ -8,6 +8,7 @@ import (
 	"zero-cloud-disk/app/applet/internal/svc"
 	"zero-cloud-disk/app/applet/internal/types"
 	"zero-cloud-disk/app/user-rpc/pb"
+	"zero-cloud-disk/utils"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -34,5 +35,6 @@ func (l *UserLoginLogic) UserLogin(req *types.UserLoginRequest) (resp *types.Use
 		_, file, line, _ := runtime.Caller(0)
 		return nil, fmt.Errorf("错误:%s\nLine:%d\n%v", file, line+1, err)
 	}
-	return &types.UserLoginResponse{Message: "登录成功"}, nil
+	token, _ := utils.NewJwtToken(req.UserEmail)
+	return &types.UserLoginResponse{Message: "登录成功", Token: token}, nil
 }

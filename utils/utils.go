@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
 
@@ -45,4 +46,13 @@ func GetUuid() string {
 	// 将 UUID 转换为字符串表示
 	uuidStr := newUUID.String()
 	return uuidStr
+}
+
+// 生成token
+
+func NewJwtToken(userEmail string) (string, error) {
+	claims := make(jwt.MapClaims)
+	claims["user_email"] = userEmail
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte("2418eb42-6991-4039-91c3-7f25873c5ad1"))
 }

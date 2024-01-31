@@ -5,6 +5,10 @@ Port: 8888
 Mysql:
   DataSource: root:123#Mysql@tcp(45.93.28.51:8000)/clouddisk?charset=utf8mb4&parseTime=True&loc=Local
 
+Auth:
+  AccessSecret: 2418eb42-6991-4039-91c3-7f25873c5ad1
+  AccessExpire: 86400
+
 CacheRedis:
   Addr: 45.93.28.51:6379
   Pass: 123#Redis

@@ -10,4 +10,8 @@ type Config struct {
 	UserRpcConf  zrpc.RpcClientConf
 	FileRpcConf  zrpc.RpcClientConf
 	ShareRpcConf zrpc.RpcClientConf
+	Auth         struct {
+		AccessSecret string
+		AccessExpire int64
+	}
 }
