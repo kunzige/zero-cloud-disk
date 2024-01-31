@@ -41,12 +41,48 @@ type FileUploadResponse struct {
 	Message string `json:"message"`
 }
 
+type CreateFolderRequest struct {
+	UserEmail string `form:"user_email"`
+	UserName  string `form:"user_name"`
+	PathName  string `form:"path_name"`
+	ParentDir string `form:"parent_dir"`
+}
+
+type CreateFolderResponse struct {
+	Message string `json:"message"`
+}
+
+type DeleteAllForeverRequest struct {
+	UserEmail string `form:"user_email"`
+}
+
+type DeleteAllForeverResponse struct {
+	Message string `json:"message"`
+}
+
+type DeleteForeverRequest struct {
+	Hash string `form:"hash"`
+}
+
+type DeleteForeverResponse struct {
+	Message string `json:"message"`
+}
+
 type FileDeleteRequest struct {
 	FileHash string `form:"file_hash"`
 }
 
 type FileDeleteResponse struct {
 	Message string `json:"message"`
+}
+
+type FileListByPathRequest struct {
+	UserEmail string `form:"user_email"`
+	Path      string `form:"path"`
+}
+
+type FileListByPathResponse struct {
+	Data interface{} `json:"data"`
 }
 
 type FileListRequest struct {
@@ -64,4 +100,12 @@ type FileMoveRequest struct {
 
 type FileMoveResponse struct {
 	Message string `json:"message"`
+}
+
+type FileRecycleListRequest struct {
+	UserEmail string `form:"user_email"`
+}
+
+type FileRecycleListResponse struct {
+	Data interface{} `json:"data"`
 }

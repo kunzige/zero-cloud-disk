@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"math/rand"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // 加密
@@ -32,4 +34,15 @@ func RandomCode() string {
 		random_code += str[rand_int : rand_int+1]
 	}
 	return random_code
+}
+
+// 获取UUID
+
+func GetUuid() string {
+	// 生成一个新的 UUID
+	newUUID := uuid.New()
+
+	// 将 UUID 转换为字符串表示
+	uuidStr := newUUID.String()
+	return uuidStr
 }

@@ -3,7 +3,6 @@ package logic
 import (
 	"context"
 	"fmt"
-
 	"zero-cloud-disk/app/files/internal/svc"
 	"zero-cloud-disk/app/files/internal/types"
 	"zero-cloud-disk/app/files/models"
@@ -26,6 +25,7 @@ func NewFileInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *FileInfo
 }
 
 func (l *FileInfoLogic) FileInfo(req *types.FileInfoRequest) (resp *types.FileInfoResponse, err error) {
+	// 单体服务
 	// todo: add your logic here and delete this line
 	fileMeta, err := l.svcCtx.TbFileModel.FindOneByFileSha1(l.ctx, req.FileHash)
 	// 内部错误
@@ -37,4 +37,12 @@ func (l *FileInfoLogic) FileInfo(req *types.FileInfoRequest) (resp *types.FileIn
 		return nil, fmt.Errorf("下载失败")
 	}
 	return &types.FileInfoResponse{UpdateAt: fileMeta.UpdateAt, FileName: fileMeta.FileName, FileSize: fileMeta.FileSize, CreateAt: fileMeta.CreateAt}, nil
+
+	// // 通过rpc调用
+	// fileInfo, err := l.svcCtx.FileRpc.GetFileInfo(l.ctx, &pb.FileInfoReq{FileHash: req.FileHash})
+	// if err != nil {
+	// 	return nil, fmt.Errorf("下载失败")
+	// }
+	// return &types.FileInfoResponse{UpdateAt: fileInfo.UpdateAt, FileName: fileInfo.FileName, FileSize: fileInfo.FileSize, CreateAt: fileInfo	.CreateAt}, nil
+
 }

@@ -1,0 +1,58 @@
+syntax="proto3";
+
+option go_package = "./pb";
+
+package pb;
+
+// 用户注册
+
+message   UserRegisterReq{
+	string	UserName=1;
+	string  UserPassword=2;
+    string  Email=3; 
+    string  Code=4;
+}
+
+message UserRegisterRes {
+	string  Message =1;
+}
+
+// 发送邮件验证码
+
+message userEmailReq {
+	string  Email=1;
+}
+
+message userEmailRes {
+	string Code=1;
+	int32    Status=2;
+}
+
+
+
+// 用户登录
+message userLoginReq {
+    string UserEmail=1;
+    string UserPassword=2;
+}
+
+message userLoginRes {
+    string Message=1;
+}
+
+// 用户信息
+message userInfoReq {
+    string UserEmail=1;
+}
+
+message userInfoRes {
+     map<string, string> Data=1;
+}
+
+
+service usercenter {
+	rpc UserRegister (UserRegisterReq) returns (UserRegisterRes);
+    rpc SendEmail (userEmailReq) returns (userEmailRes);
+    rpc GetUserInfo (userInfoReq) returns (userInfoRes);
+    rpc UserLogin (userLoginReq) returns (userLoginRes);
+}

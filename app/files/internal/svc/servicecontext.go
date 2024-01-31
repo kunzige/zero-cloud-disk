@@ -11,6 +11,7 @@ type ServiceContext struct {
 	Config          config.Config
 	TbFileModel     models.TbFileModel
 	TbUserFileModel models.TbUserFileModel
+	// FileRpc         filecenter.Filecenter
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -18,5 +19,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		Config:          c,
 		TbFileModel:     models.NewTbFileModel(sqlx.NewSqlConn("mysql", c.Mysql.DataSource)),
 		TbUserFileModel: models.NewTbUserFileModel(sqlx.NewSqlConn("mysql", c.Mysql.DataSource)),
+		// FileRpc:         filecenter.NewFilecenter(zrpc.MustNewClient(c.FileRpcConf)),
 	}
 }

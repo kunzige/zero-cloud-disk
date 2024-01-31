@@ -1,0 +1,17 @@
+Name: user.rpc
+ListenOn: 0.0.0.0:8083
+
+
+Mysql:
+  DataSource: root:123#Mysql@tcp(45.93.28.51:8000)/clouddisk?charset=utf8mb4&parseTime=True&loc=Local
+
+CacheRedis:
+  Addr: 45.93.28.51:6379
+  Pass: 123#Redis
+
+Etcd:
+  Hosts:
+    - 45.93.28.51:2379
+  Key: user.rpc
+
+Mode: dev

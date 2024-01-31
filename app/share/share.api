@@ -1,0 +1,53 @@
+syntax = "v1"
+
+info (
+	user: "kunzige"
+	desc: "文件分享相关的处理"
+)
+
+// 分享文件
+type fileShareRequest {
+	FileHash  string `form:"file_hash,optional"`
+	UserEmail string `form:"user_email"`
+	UserName  string `form:"user_name"`
+	Path      string `form:"path,optional"`
+	ShareUuid string `form:"share_uuid"`
+	Duration  int    `form:"duration"`
+}
+
+type fileShareResponse {
+	Message string `json:"message"`
+}
+
+// 取消分享
+type cancelFileShareRequest {
+	ShareUuid string `form:"share_uuid"`
+}
+
+type cancelFileShareResponse {
+	Message string `json:"message"`
+}
+
+// 查看分享的文件
+type getShareRequest {
+	ShareUuid string `form:"share_uuid"`
+}
+
+type getShareResponse {
+	Data interface{} `json:"data"`
+}
+
+service shareService {
+	@doc "分享文件"
+	@handler shareFileHandler
+	post /file/share (fileShareRequest) returns (fileShareResponse)
+
+	@doc "取消分享"
+	@handler cancelShareFileHandler
+	delete /file/share/cancel (cancelFileShareRequest) returns (cancelFileShareResponse)
+
+	@doc "查看分享的文件"
+	@handler getShareFileHandler
+	get /file/share/get (getShareRequest) returns (getShareResponse)
+}
+

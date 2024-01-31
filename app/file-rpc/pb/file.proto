@@ -1,0 +1,143 @@
+syntax="proto3";
+
+option go_package = "./pb";
+
+package pb;
+
+// 文件信息
+
+message  FileInfoReq {
+	string  FileHash = 1;
+}
+
+message FileInfoRes {
+	string FileName=1;
+	int64 FileSize =2;
+	string CreateAt =3;
+	string UpdateAt =4;
+}
+
+
+
+
+// 文件下载
+
+message FileDownloadReq {
+	string FileHash=1;
+}
+
+message FileDownloadRes {
+	string Message=1;
+	string FileName=2;
+	string FilePath=3;
+	int64  FileSize=4;
+}
+
+
+
+// 修改文件(暂时只是文件名)
+message FileModifyReq {
+	string FileHash=1;
+	string NewFileName=2;
+}
+
+message FileModifyRes {
+	string  Message=1;
+}
+
+// 移动文件
+message FileMoveReq {
+	string FileHash=1;
+	string NewPath=2;
+}
+
+message FileMoveRes {
+	string  Message=1;
+}
+
+// 删除文件
+message FileDeleteReq {
+	string  FileHash=1;
+}
+
+message FileDeleteRes {
+	string  Message=1;
+}
+
+
+message File {
+  string file_name = 1;
+  string file_size = 2;
+  string file_addr = 3;
+  string upload_at = 4;
+  string last_update = 5;
+}
+
+// 获取用户在某目录下的文件
+message FileListByPathReq {
+	string  UserEmail=1;
+	string  Path=2;
+}
+
+message FileListByPathRes {
+  repeated File files = 1;
+}
+
+// 获取回收站中的文件目录
+message RecycleFile{
+	string file_name=1;
+	int64 file_size=2;
+	string upload_at=3;
+	string last_update=4;
+}
+
+message FileRecycleListReq {
+	string UserEmail=1;
+}
+
+message FileRecycleListRes {
+	repeated RecycleFile recycle_files=1;
+}
+
+// 彻底删除
+message DeleteForeverReq {
+	string Hash=1;
+}
+
+message DeleteForeverRes {
+	string Message=1;
+}
+
+message DeleteAllForeverReq {
+	string UserEmail=1;
+}
+
+message DeleteAllForeverRes {
+	string  Message=1;
+}
+
+// 创建文件夹
+message CreateFolderReq {
+	string  UserEmail=1;
+	string  UserName=2;
+	string  PathName=3;
+	string  ParentDir=4;
+}
+
+message CreateFolderRes {
+	string Message =1;
+}
+
+
+service filecenter {
+	rpc GetFileInfo (FileInfoReq) returns (FileInfoRes);
+	rpc FileDownload (FileDownloadReq) returns (FileDownloadRes);
+	rpc FileModify (FileModifyReq) returns (FileModifyRes);
+	rpc FileMove (FileMoveReq) returns (FileMoveRes);
+	rpc FileDelete (FileDeleteReq) returns (FileDeleteRes);
+	rpc FileDeleteForever (DeleteForeverReq) returns (DeleteForeverRes);
+	rpc FileDeleteAllForever (DeleteAllForeverReq) returns (DeleteAllForeverRes);
+	rpc FileListByPath (FileListByPathReq) returns (FileListByPathRes);
+	rpc CreateFolder (CreateFolderReq) returns (CreateFolderRes);
+	rpc FileRecycleList (FileRecycleListReq) returns (FileRecycleListRes);
+}

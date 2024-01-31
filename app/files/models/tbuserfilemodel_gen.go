@@ -8,9 +8,10 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"runtime"
 
 	"github.com/zeromicro/go-zero/core/stores/builder"
-	_"github.com/zeromicro/go-zero/core/stores/sqlc"
+	_ "github.com/zeromicro/go-zero/core/stores/sqlc"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"github.com/zeromicro/go-zero/core/stringx"
 )
@@ -30,6 +31,11 @@ type (
 		Delete(ctx context.Context, id int64) error
 		FindListByEmail(ctx context.Context,email string) ([]*TbUserFile, error)
 		DeleteByHash(ctx context.Context, hash string) error
+		DeleteByHashForever(ctx context.Context, hash string) error
+		DeleteAllForever(ctx context.Context, email string) error
+		FindListByPath(ctx context.Context,email string,path string)  ([]*TbUserPathFile ,error)
+		FindListByRecycle(ctx context.Context,email string) ([]*TbUserFile, error)
+		InsertPath(ctx context.Context,user_email string,user_name string,path_name string,parent_dir string,hash string) error
 	}
 
 	defaultTbUserFileModel struct {
@@ -48,6 +54,24 @@ type (
 		LastUpdate time.Time `db:"last_update"` // 更新时间
 		Status     int64     `db:"status"`      // 0正常1删除2禁用
 	}
+
+	// 这里用了多表联合查，这个结构体与对应结果的表对应就行了
+
+	TbUserPathFile struct {
+		FileName   string    `db:"file_name"`   // 文件名
+		FileSize   int64     `db:"file_size"`   // 文件大小
+		FileAddr   string    `db:"file_addr"`   // 文件地址
+		UploadAt   time.Time `db:"upload_at"`   // 上传时间
+		LastUpdate time.Time `db:"last_update"` // 更新时间
+
+	}
+
+	TbFolder struct{
+		UserEmail string `db:"user_email"`
+		FileAddr string `db:"file_addr"`
+		FileName string `db:"file_name"`
+	}
+
 )
 
 func newTbUserFileModel(conn sqlx.SqlConn) *defaultTbUserFileModel {
@@ -64,8 +88,20 @@ func (m *defaultTbUserFileModel) Delete(ctx context.Context, id int64) error {
 }
 
 func (m *defaultTbUserFileModel) DeleteByHash(ctx context.Context, hash string) error {
+	query := fmt.Sprintf("update %s set status =1 where `file_sha1` = ?", m.table)
+	_, err := m.conn.ExecCtx(ctx, query, hash)
+	return err
+}
+
+func (m *defaultTbUserFileModel) DeleteByHashForever(ctx context.Context, hash string) error {
 	query := fmt.Sprintf("delete from %s where `file_sha1` = ?", m.table)
 	_, err := m.conn.ExecCtx(ctx, query, hash)
+	return err
+}
+
+func (m *defaultTbUserFileModel) DeleteAllForever(ctx context.Context, email string) error {
+	query := fmt.Sprintf("delete from %s where `user_email` = ? and status =1", m.table)
+	_, err := m.conn.ExecCtx(ctx, query, email)
 	return err
 }
 
@@ -98,11 +134,87 @@ func (m *defaultTbUserFileModel) FindListByEmail(ctx context.Context,email strin
 	}
 }
 
+
+func (m *defaultTbUserFileModel)FindListByPath(ctx context.Context,email string,path string)([]*TbUserPathFile,error){
+	
+	query1 := fmt.Sprintf("select tb_user_file.file_name,tb_user_file.file_size,tb_file.file_addr,tb_user_file.upload_at,tb_user_file.last_update FROM `tb_user_file` JOIN `tb_file` ON tb_user_file.file_sha1 = tb_file.file_sha1 where file_addr=? AND user_email= ?")
+	var resp []*TbUserPathFile
+	err := m.conn.QueryRowsCtx(ctx, &resp, query1,path,email)
+	switch err {
+	case nil:
+		return resp, nil
+	case sqlx.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
+
+func (m *defaultTbUserFileModel) FindListByRecycle(ctx context.Context,email string) ([]*TbUserFile, error) {
+	query := fmt.Sprintf("select %s from %s where `user_email` = ? and status = 1", tbUserFileRows, m.table)
+	var resp []*TbUserFile
+	err := m.conn.QueryRowsCtx(ctx, &resp, query, email)
+	switch err {
+	case nil:
+		return resp, nil
+	case sqlx.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
+
+
 func (m *defaultTbUserFileModel) Insert(ctx context.Context, data *TbUserFile) (sql.Result, error) {
 	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?)", m.table, tbUserFileRowsExpectAutoSet)
 	ret, err := m.conn.ExecCtx(ctx, query, data.UserName, data.UserEmail, data.FileName, data.FileSize, data.FileSha1, data.UploadAt, data.LastUpdate, data.Status)
 	return ret, err
 }
+
+func (m *defaultTbUserFileModel) InsertPath(ctx context.Context,user_email string,user_name string,path_name string,parent_dir string,hash string) error {
+	
+	return m.conn.Transact(
+		func(session sqlx.Session) error {
+			// 检测该用户目录下是否存在同名文件夹
+			var resp []*TbFolder
+			query := fmt.Sprintf("select tb_user_file.user_email,tb_file.file_addr,tb_file.file_name from %s join %s on tb_user_file.file_sha1 = tb_file.file_sha1 where tb_user_file.user_email= ? and tb_file.file_addr=? and tb_user_file.type='dir'",GetUserFileName(),GetFileName())
+			err := session.QueryRows(&resp,query, user_email, parent_dir)
+			// return ret, err
+			if err!=nil{
+				_, file, line, _ := runtime.Caller(0)
+				return fmt.Errorf("创建失败:%s\nLine:%d\n%v", file, line+1,err)
+			}else{
+				for i:=0;i<len(resp);i++{
+					if resp[i].FileAddr==parent_dir && resp[i].FileName==path_name{
+						_, file, line, _ := runtime.Caller(0)
+						return fmt.Errorf("创建失败:%s\nLine:%d\n%v", file, line+1, "文件夹重复")
+					}
+				}
+			}
+			// 在文件表中添加
+			query1 := fmt.Sprintf("insert into %s (file_name,file_addr) values (?, ?)", GetFileName())
+			_, err = session.ExecCtx(ctx, query1, path_name, parent_dir)
+			// return ret, err
+			if err!=nil{
+				return err
+			}
+	
+			// 在用户文件表中添加
+			query2 := fmt.Sprintf("insert into %s (user_name,user_email,file_name,type,file_sha1) values (?, ?,?, ?)",GetUserFileName())
+			_, err = session.Exec(query2, user_name, user_email, path_name,"dir",hash)
+			if err!=nil{
+				return err
+			}
+			return  nil
+		},
+	)
+
+
+}
+
+
 
 func (m *defaultTbUserFileModel) Update(ctx context.Context, data *TbUserFile) error {
 	query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, tbUserFileRowsWithPlaceHolder)
@@ -117,4 +229,8 @@ func (m *defaultTbUserFileModel) tableName() string {
 
 func GetUserFileName()string{
 	return "tb_user_file"
+}
+
+func GetFileName()string{
+	return "tb_file"
 }

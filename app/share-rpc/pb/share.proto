@@ -1,0 +1,54 @@
+syntax="proto3";
+
+option go_package = "./pb";
+
+package pb;
+
+
+
+// 分享文件
+message fileShareReq {
+	string  FileHash=1;
+	string  UserEmail=2;
+	string  UserName=3;
+	string  Path=4;
+	string  ShareUuid=5;
+	int64   Duration=6;
+}
+
+message fileShareRes {
+	string  Message=1;
+}
+
+// 取消分享
+message cancelFileShareReq {
+	string  ShareUuid=1;
+}
+
+message cancelFileShareRes {
+	string  Message=1;
+}
+
+// 查看分享的文件
+message getShareReq {
+	string  ShareUuid=1;
+}
+
+message SharedFile {
+    string user_name=1;
+	string file_name=2;
+	int64  file_size=3;
+    string file_addr=4;
+}
+
+message SharedFiles {
+   SharedFile shared_files=1;
+}
+
+
+
+service sharecenter{
+    rpc FileShare (fileShareReq) returns (fileShareRes);
+    rpc CancelFileShare (cancelFileShareReq) returns (cancelFileShareRes);
+    rpc GetFileShare (getShareReq) returns (SharedFiles);
+}

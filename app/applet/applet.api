@@ -1,0 +1,281 @@
+syntax = "v1"
+
+info (
+	user: "kunzige"
+	desc: "网盘服务"
+)
+
+// 用户注册
+type userRegisterRequest {
+	UserName     string `form:"user_name"`
+	UserPassword string `form:"user_password"`
+	Email        string `form:"email"`
+	Code         string `form:"code"`
+}
+
+type userRegisterResponse {
+	Message string `json:"message"`
+}
+
+// 发送邮件
+type userEmailRequest {
+	Email string `form:"email"`
+}
+
+type userEmailResponse {
+	Code   string `json:"code"`
+	Status int    `json:"status,default=1"`
+}
+
+// 用户登录
+type userLoginRequest {
+	UserEmail    string `form:"user_email"`
+	UserPassword string `form:"user_password"`
+}
+
+type userLoginResponse {
+	Message string `json:"message"`
+}
+
+// 用户信息
+type userInfoRequest {
+	UserEmail string `form:"user_email"`
+}
+
+type userInfoResponse {
+	Data interface{} `json:"data"`
+}
+
+@server (
+	group:  user
+	prefix: /user
+)
+service DiskService {
+	@doc "用户注册"
+	@handler userRegisterHandler
+	post /register (userRegisterRequest) returns (userRegisterResponse)
+
+	@doc "发送邮件验证码"
+	@handler sendEmailHandler
+	post /sendemail (userEmailRequest) returns (userEmailResponse)
+
+	@doc "用户登录"
+	@handler userLoginHandler
+	post /login (userLoginRequest) returns (userLoginResponse)
+
+	@doc "获取用户信息"
+	@handler userInfoHandler
+	get /info (userInfoRequest) returns (userInfoResponse)
+}
+
+// 上传文件
+type FileUploadRequest {
+	UserName  string `form:"user_name"`
+	UserEmail string `form:"user_email"`
+}
+
+type FileUploadResponse {
+	Message string `json:"message"`
+}
+
+// 下载文件
+type FileDownloadRequest {
+	FileHash string `form:"file_hash"`
+}
+
+type FileDownloadResponse {
+	Message  string `json:"message"`
+	FileName string `json:"file_name"`
+	FilePath string `json:"file_path"`
+	FileSize int64  `json:"file_size"`
+}
+
+// 获取文件信息
+type FileInfoRequest {
+	FileHash string `form:"file_hash"`
+}
+
+type FileInfoResponse {
+	FileName string `json:"file_name"`
+	FileSize int64  `json:"file_size"`
+	CreateAt string `json:"create_at"`
+	UpdateAt string `json:"update_at"`
+}
+
+// 修改文件(暂时只是文件名)
+type FileModifyRequest {
+	FileHash    string `form:"file_hash"`
+	NewFileName string `form:"new_file_name"`
+}
+
+type FileModifyResponse {
+	Message string `json:"message"`
+}
+
+// 移动文件
+type fileMoveRequest {
+	FileHash string `form:"file_hash"`
+	NewPath  string `form:"new_path"`
+}
+
+type fileMoveResponse {
+	Message string `json:"message"`
+}
+
+// 删除文件
+type fileDeleteRequest {
+	FileHash string `form:"file_hash"`
+}
+
+type fileDeleteResponse {
+	Message string `json:"message"`
+}
+
+// 获取用户在某目录下的文件
+type fileListByPathRequest {
+	UserEmail string `form:"user_email"`
+	Path      string `form:"path"`
+}
+
+type fileListByPathResponse {
+	Data interface{} `json:"data"`
+}
+
+// 获取回收站中的文件目录
+type fileRecycleListRequest {
+	UserEmail string `form:"user_email"`
+}
+
+type fileRecycleListResponse {
+	Data interface{} `json:"data"`
+}
+
+// 彻底删除
+type deleteForeverRequest {
+	Hash string `form:"hash"`
+}
+
+type deleteForeverResponse {
+	Message string `json:"message"`
+}
+
+type deleteAllForeverRequest {
+	UserEmail string `form:"user_email"`
+}
+
+type deleteAllForeverResponse {
+	Message string `json:"message"`
+}
+
+// 创建文件夹
+type createFolderRequest {
+	UserEmail string `form:"user_email"`
+	UserName  string `form:"user_name"`
+	PathName  string `form:"path_name"`
+	ParentDir string `form:"parent_dir"`
+}
+
+type createFolderResponse {
+	Message string `json:"message"`
+}
+
+@server (
+	prefix: /file
+	group:  file
+)
+service DiskService {
+	@doc "文件上传"
+	@handler fileUploadHandler
+	post /upload returns (FileUploadResponse)
+
+	@doc "文件下载"
+	@handler fileDownloadHandler
+	get /download (FileDownloadRequest) returns (FileDownloadResponse)
+
+	@doc "获取文件信息"
+	@handler fileInfoHandler
+	get /info (FileInfoRequest) returns (FileInfoResponse)
+
+	@doc "修改文件信息"
+	@handler fileModifyHandler
+	post /modify (FileModifyRequest) returns (FileModifyResponse)
+
+	@doc "移动文件"
+	@handler fileMoveHandler
+	post /move (fileMoveRequest) returns (fileMoveResponse)
+
+	@doc "删除文件"
+	@handler fileDeleteHandler
+	delete /delete (fileDeleteRequest) returns (fileDeleteResponse)
+
+	@doc "获取用户在某目录下的文件"
+	@handler fileListByPathHandler
+	get /pathlist (fileListByPathRequest) returns (fileListByPathResponse)
+
+	@doc "回收站"
+	@handler recycleHandler
+	get /recycle (fileRecycleListRequest) returns (fileRecycleListResponse)
+
+	@doc "彻底删除"
+	@handler deleteForerverHandler
+	delete /deleteforever (deleteForeverRequest) returns (deleteForeverResponse)
+
+	@doc "全部彻底删除"
+	@handler deleteAllForerverHandler
+	delete /deleteallforever (deleteAllForeverRequest) returns (deleteAllForeverResponse)
+
+	@doc "创建文件夹"
+	@handler createFolderHandler
+	post /createfolder (createFolderRequest) returns (createFolderResponse)
+}
+
+// 分享文件
+type fileShareRequest {
+	FileHash  string `form:"file_hash,optional"`
+	UserEmail string `form:"user_email"`
+	UserName  string `form:"user_name"`
+	Path      string `form:"path,optional"`
+	ShareUuid string `form:"share_uuid"`
+	Duration  int    `form:"duration"`
+}
+
+type fileShareResponse {
+	Message string `json:"message"`
+}
+
+// 取消分享
+type cancelFileShareRequest {
+	ShareUuid string `form:"share_uuid"`
+}
+
+type cancelFileShareResponse {
+	Message string `json:"message"`
+}
+
+// 查看分享的文件
+type getShareRequest {
+	ShareUuid string `form:"share_uuid"`
+}
+
+type getShareResponse {
+	Data interface{} `json:"data"`
+}
+
+@server (
+	prefix: /share
+	group:  share
+)
+service DiskService {
+	@doc "分享文件"
+	@handler fileShareHandler
+	post /file (fileShareRequest) returns (fileShareResponse)
+
+	@doc "取消分享"
+	@handler cancelFileShareHandler
+	delete /cancel (cancelFileShareRequest) returns (cancelFileShareResponse)
+
+	@doc "查看分享的文件"
+	@handler getShareHandler
+	get /get (getShareRequest) returns (getShareResponse)
+}
+

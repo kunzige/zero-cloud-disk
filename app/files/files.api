@@ -77,6 +77,54 @@ type fileListResponse {
 	Data interface{} `json:"data"`
 }
 
+// 获取用户在某目录下的文件
+type fileListByPathRequest {
+	UserEmail string `form:"user_email"`
+	Path      string `form:"path"`
+}
+
+type fileListByPathResponse {
+	Data interface{} `json:"data"`
+}
+
+// 获取回收站中的文件目录
+type fileRecycleListRequest {
+	UserEmail string `form:"user_email"`
+}
+
+type fileRecycleListResponse {
+	Data interface{} `json:"data"`
+}
+
+// 彻底删除
+type deleteForeverRequest {
+	Hash string `form:"hash"`
+}
+
+type deleteForeverResponse {
+	Message string `json:"message"`
+}
+
+type deleteAllForeverRequest {
+	UserEmail string `form:"user_email"`
+}
+
+type deleteAllForeverResponse {
+	Message string `json:"message"`
+}
+
+// 创建文件夹
+type createFolderRequest {
+	UserEmail string `form:"user_email"`
+	UserName  string `form:"user_name"`
+	PathName  string `form:"path_name"`
+	ParentDir string `form:"parent_dir"`
+}
+
+type createFolderResponse {
+	Message string `json:"message"`
+}
+
 service FileService {
 	@doc "文件上传"
 	@handler fileUploadHandler
@@ -105,5 +153,25 @@ service FileService {
 	@doc "获取文件列表"
 	@handler fileListHandler
 	get /file/list (fileListRequest) returns (fileListResponse)
+
+	@doc "获取用户在某目录下的文件"
+	@handler fileListByPathHandler
+	get /file/pathlist (fileListByPathRequest) returns (fileListByPathResponse)
+
+	@doc "回收站"
+	@handler recycleHandler
+	get /file/recycle (fileRecycleListRequest) returns (fileRecycleListResponse)
+
+	@doc "彻底删除"
+	@handler deleteForerverHandler
+	delete /file/deleteforever (deleteForeverRequest) returns (deleteForeverResponse)
+
+	@doc "全部彻底删除"
+	@handler deleteAllForerverHandler
+	delete /file/deleteallforever (deleteAllForeverRequest) returns (deleteAllForeverResponse)
+
+	@doc "创建文件夹"
+	@handler createFolderHandler
+	post /file/createfolder (createFolderRequest) returns (createFolderResponse)
 }
 

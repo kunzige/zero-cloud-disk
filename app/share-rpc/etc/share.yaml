@@ -1,0 +1,11 @@
+Name: share.rpc
+ListenOn: 0.0.0.0:8085
+Etcd:
+  Hosts:
+  - 45.93.28.51:2379
+  Key: share.rpc
+
+Mode: dev
+
+Mysql:
+  DataSource: root:123#Mysql@tcp(45.93.28.51:8000)/clouddisk?charset=utf8mb4&parseTime=True&loc=Local

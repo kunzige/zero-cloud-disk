@@ -17,6 +17,8 @@ type userRegisterResponse {
 	Message string `json:"message"`
 }
 
+// 发送邮件
+
 type userEmailRequest {
 	Email string `form:"email"`
 }
@@ -27,6 +29,9 @@ type userEmailResponse {
 }
 
 // 用户登录
+
+
+
 // 用户信息
 
 
