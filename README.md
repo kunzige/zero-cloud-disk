@@ -2,21 +2,21 @@
 > 基于go-zero,sqlx的在线网盘系统
 
 ## 启动服务
-cd app/applet
-go run diskservice.go
+    cd app/applet
+    go run diskservice.go
 
 ## 启动文件微服务
 ### 文件服务
-cd app/file-rpc/
-go run file.go 
+    cd app/file-rpc/
+    go run file.go 
 
 ### 用户服务
-cd app/user-rpc/
-go run user.go 
+    cd app/user-rpc/
+    go run user.go 
 
 ### 分享服务
-cd app/share-rpc/
-go run share.go 
+    cd app/share-rpc/
+    go run share.go 
 
 
 ## 文件模块
