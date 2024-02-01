@@ -1,8 +1,8 @@
 # zero-cloud-disk
-> 基于go-zero,sqlx的在线网盘系统
-> 使用goctl作为编译项目和管理服务的工具
-> 使用gRPC来构建和处理服务间的请求和响应。
-> 使用JWT进行权限校验。
+> - 基于go-zero,sqlx的在线网盘系统。
+> - 使用goctl作为编译项目和管理服务的工具。
+> - 使用gRPC来构建和处理服务间的请求和响应。
+> - 使用JWT进行权限校验。
 
 ## 启动服务
     cd app/applet
