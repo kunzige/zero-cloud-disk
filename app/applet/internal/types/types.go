@@ -131,6 +131,19 @@ type GetShareResponse struct {
 	Data interface{} `json:"data"`
 }
 
+type SaveFileRequest struct {
+	ShareIdentity string `form:"share_identity"`
+	UserEmail     string `form:"user_email"`
+	FileName      string `form:"file_name"`
+	FileSize      int64  `form:"file_size"`
+	UserName      string `form:"user_name"`
+	Type          string `form:"type"`
+}
+
+type SaveFileResponse struct {
+	Message string `json:"message"`
+}
+
 type UserEmailRequest struct {
 	Email string `form:"email"`
 }

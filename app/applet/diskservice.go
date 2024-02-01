@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net/http"
 
 	"zero-cloud-disk/app/applet/internal/config"
 	"zero-cloud-disk/app/applet/internal/handler"
@@ -20,7 +21,10 @@ func main() {
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
 
-	server := rest.MustNewServer(c.RestConf)
+	server := rest.MustNewServer(c.RestConf, rest.WithUnauthorizedCallback(func(w http.ResponseWriter, r *http.Request, err error) {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Unauthorized"))
+	}))
 	defer server.Stop()
 
 	ctx := svc.NewServiceContext(c)

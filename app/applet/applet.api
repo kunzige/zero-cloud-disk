@@ -270,6 +270,20 @@ type getShareResponse {
 	Data interface{} `json:"data"`
 }
 
+// 转存文件
+type saveFileRequest {
+	ShareIdentity string `form:"share_identity"`
+	UserEmail     string `form:"user_email"`
+	FileName      string `form:"file_name"`
+	FileSize      int64  `form:"file_size"`
+	UserName      string `form:"user_name"`
+	Type          string `form:"type"`
+}
+
+type saveFileResponse {
+	Message string `json:"message"`
+}
+
 @server (
 	prefix: /share
 	group:  share
@@ -283,6 +297,10 @@ service DiskService {
 	@doc "取消分享"
 	@handler cancelFileShareHandler
 	delete /cancel (cancelFileShareRequest) returns (cancelFileShareResponse)
+
+	@doc "转存文件"
+	@handler saveFileHandler
+	post /save (saveFileRequest) returns (saveFileResponse)
 }
 
 @server (

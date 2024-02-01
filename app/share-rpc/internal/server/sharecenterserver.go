@@ -36,3 +36,8 @@ func (s *SharecenterServer) GetFileShare(ctx context.Context, in *pb.GetShareReq
 	l := logic.NewGetFileShareLogic(ctx, s.svcCtx)
 	return l.GetFileShare(in)
 }
+
+func (s *SharecenterServer) SaveFileShare(ctx context.Context, in *pb.SaveFileReq) (*pb.SaveFileRes, error) {
+	l := logic.NewSaveFileShareLogic(ctx, s.svcCtx)
+	return l.SaveFileShare(in)
+}

@@ -39,16 +39,32 @@ message SharedFile {
 	string file_name=2;
 	int64  file_size=3;
     string file_addr=4;
+	string shared_identity=5;
+	string type=6;
 }
 
 message SharedFiles {
    SharedFile shared_files=1;
 }
 
+// 转存文件
+message saveFileReq{
+	string ShareIdentity=1;
+	string  UserEmail=2;
+	string  FileName=3;
+	int64   FileSize=4;
+	string  UserName=5;
+	string  Type=6;
+}
+
+message saveFileRes {
+	string  Message=1;
+}
 
 
 service sharecenter{
     rpc FileShare (fileShareReq) returns (fileShareRes);
     rpc CancelFileShare (cancelFileShareReq) returns (cancelFileShareRes);
     rpc GetFileShare (getShareReq) returns (SharedFiles);
+	rpc SaveFileShare (saveFileReq) returns (saveFileRes);
 }

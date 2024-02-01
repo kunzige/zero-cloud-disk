@@ -22,6 +22,7 @@ const (
 	Sharecenter_FileShare_FullMethodName       = "/pb.sharecenter/FileShare"
 	Sharecenter_CancelFileShare_FullMethodName = "/pb.sharecenter/CancelFileShare"
 	Sharecenter_GetFileShare_FullMethodName    = "/pb.sharecenter/GetFileShare"
+	Sharecenter_SaveFileShare_FullMethodName   = "/pb.sharecenter/SaveFileShare"
 )
 
 // SharecenterClient is the client API for Sharecenter service.
@@ -31,6 +32,7 @@ type SharecenterClient interface {
 	FileShare(ctx context.Context, in *FileShareReq, opts ...grpc.CallOption) (*FileShareRes, error)
 	CancelFileShare(ctx context.Context, in *CancelFileShareReq, opts ...grpc.CallOption) (*CancelFileShareRes, error)
 	GetFileShare(ctx context.Context, in *GetShareReq, opts ...grpc.CallOption) (*SharedFiles, error)
+	SaveFileShare(ctx context.Context, in *SaveFileReq, opts ...grpc.CallOption) (*SaveFileRes, error)
 }
 
 type sharecenterClient struct {
@@ -68,6 +70,15 @@ func (c *sharecenterClient) GetFileShare(ctx context.Context, in *GetShareReq, o
 	return out, nil
 }
 
+func (c *sharecenterClient) SaveFileShare(ctx context.Context, in *SaveFileReq, opts ...grpc.CallOption) (*SaveFileRes, error) {
+	out := new(SaveFileRes)
+	err := c.cc.Invoke(ctx, Sharecenter_SaveFileShare_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SharecenterServer is the server API for Sharecenter service.
 // All implementations must embed UnimplementedSharecenterServer
 // for forward compatibility
@@ -75,6 +86,7 @@ type SharecenterServer interface {
 	FileShare(context.Context, *FileShareReq) (*FileShareRes, error)
 	CancelFileShare(context.Context, *CancelFileShareReq) (*CancelFileShareRes, error)
 	GetFileShare(context.Context, *GetShareReq) (*SharedFiles, error)
+	SaveFileShare(context.Context, *SaveFileReq) (*SaveFileRes, error)
 	mustEmbedUnimplementedSharecenterServer()
 }
 
@@ -90,6 +102,9 @@ func (UnimplementedSharecenterServer) CancelFileShare(context.Context, *CancelFi
 }
 func (UnimplementedSharecenterServer) GetFileShare(context.Context, *GetShareReq) (*SharedFiles, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFileShare not implemented")
+}
+func (UnimplementedSharecenterServer) SaveFileShare(context.Context, *SaveFileReq) (*SaveFileRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SaveFileShare not implemented")
 }
 func (UnimplementedSharecenterServer) mustEmbedUnimplementedSharecenterServer() {}
 
@@ -158,6 +173,24 @@ func _Sharecenter_GetFileShare_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Sharecenter_SaveFileShare_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SaveFileReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SharecenterServer).SaveFileShare(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Sharecenter_SaveFileShare_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SharecenterServer).SaveFileShare(ctx, req.(*SaveFileReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Sharecenter_ServiceDesc is the grpc.ServiceDesc for Sharecenter service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -176,6 +209,10 @@ var Sharecenter_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetFileShare",
 			Handler:    _Sharecenter_GetFileShare_Handler,
+		},
+		{
+			MethodName: "SaveFileShare",
+			Handler:    _Sharecenter_SaveFileShare_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

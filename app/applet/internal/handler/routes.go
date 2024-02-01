@@ -87,6 +87,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/file",
 				Handler: share.FileShareHandler(serverCtx),
 			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/save",
+				Handler: share.SaveFileHandler(serverCtx),
+			},
 		},
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/share"),

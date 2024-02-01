@@ -64,6 +64,8 @@ type (
 		Path          string          `db:"file_addr"`
 		FileName 	    string         `db:"file_name"`
 		FileSize       int64          `db:"file_size"`
+		ShareIdentity string         `db:"share_identity"` // 文件hash
+		Type           string         `db:"type"`
 	}
 
 )
@@ -104,7 +106,7 @@ func (m *defaultTbShareModel) FindOne(ctx context.Context, id int64) (*TbShare, 
 
 
 func (m *defaultTbShareModel) FindByUuid(ctx context.Context, uuid string) (*SharedData, error) {
-	query := fmt.Sprintf("select tb_file.file_name,tb_file.file_addr,tb_file.file_size,tb_share.user_name from tb_share join tb_file on tb_share.share_identity=tb_file.file_sha1 where tb_share.share_uuid= ?")
+	query := fmt.Sprintf("select tb_file.file_name,tb_file.file_addr,tb_file.file_size,tb_share.user_name,tb_share.share_identity,tb_user_file.type from tb_share join tb_file on tb_share.share_identity=tb_file.file_sha1 join tb_user_file on tb_share.share_identity = tb_user_file.file_sha1 where tb_share.share_uuid=?")
 	var resp SharedData
 	err := m.conn.QueryRowCtx(ctx, &resp, query, uuid)
 	switch err {

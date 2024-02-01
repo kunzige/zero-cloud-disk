@@ -32,6 +32,6 @@ func (l *GetFileShareLogic) GetFileShare(in *pb.GetShareReq) (*pb.SharedFiles, e
 		_, file, line, _ := runtime.Caller(0)
 		return nil, fmt.Errorf("获取分享链接失败:%s\nLine:%d\n%v", file, line+1, err)
 	}
-	sharedFile := &pb.SharedFile{UserName: data.UserName, FileAddr: data.Path, FileSize: data.FileSize, FileName: data.FileName}
+	sharedFile := &pb.SharedFile{UserName: data.UserName, FileAddr: data.Path, FileSize: data.FileSize, FileName: data.FileName, SharedIdentity: data.ShareIdentity, Type: data.Type}
 	return &pb.SharedFiles{SharedFiles: sharedFile}, nil
 }

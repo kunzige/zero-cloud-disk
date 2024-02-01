@@ -18,6 +18,8 @@ type (
 	FileShareReq       = pb.FileShareReq
 	FileShareRes       = pb.FileShareRes
 	GetShareReq        = pb.GetShareReq
+	SaveFileReq        = pb.SaveFileReq
+	SaveFileRes        = pb.SaveFileRes
 	SharedFile         = pb.SharedFile
 	SharedFiles        = pb.SharedFiles
 
@@ -25,6 +27,7 @@ type (
 		FileShare(ctx context.Context, in *FileShareReq, opts ...grpc.CallOption) (*FileShareRes, error)
 		CancelFileShare(ctx context.Context, in *CancelFileShareReq, opts ...grpc.CallOption) (*CancelFileShareRes, error)
 		GetFileShare(ctx context.Context, in *GetShareReq, opts ...grpc.CallOption) (*SharedFiles, error)
+		SaveFileShare(ctx context.Context, in *SaveFileReq, opts ...grpc.CallOption) (*SaveFileRes, error)
 	}
 
 	defaultSharecenter struct {
@@ -51,4 +54,9 @@ func (m *defaultSharecenter) CancelFileShare(ctx context.Context, in *CancelFile
 func (m *defaultSharecenter) GetFileShare(ctx context.Context, in *GetShareReq, opts ...grpc.CallOption) (*SharedFiles, error) {
 	client := pb.NewSharecenterClient(m.cli.Conn())
 	return client.GetFileShare(ctx, in, opts...)
+}
+
+func (m *defaultSharecenter) SaveFileShare(ctx context.Context, in *SaveFileReq, opts ...grpc.CallOption) (*SaveFileRes, error) {
+	client := pb.NewSharecenterClient(m.cli.Conn())
+	return client.SaveFileShare(ctx, in, opts...)
 }

@@ -8,13 +8,15 @@ import (
 )
 
 type ServiceContext struct {
-	Config     config.Config
-	ShareModel models.TbShareModel
+	Config          config.Config
+	ShareModel      models.TbShareModel
+	TbUserFileModel models.TbUserFileModel
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
 	return &ServiceContext{
-		Config:     c,
-		ShareModel: models.NewTbShareModel(sqlx.NewMysql(c.Mysql.DataSource)),
+		Config:          c,
+		ShareModel:      models.NewTbShareModel(sqlx.NewMysql(c.Mysql.DataSource)),
+		TbUserFileModel: models.NewTbUserFileModel(sqlx.NewSqlConn("mysql", c.Mysql.DataSource)),
 	}
 }
